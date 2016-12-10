@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Dashboard</h1>
+<p>You are currently logged in as {{ session.display }} ({{ session.user }}).</p>
+<h2>Your recent sessions</h2>
+{% if sessions %}
+<table>
+    <thead>
+        <tr>
+            <th>Domain</th>
+            <th>Issued</th>
+            <th>Signed out</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for session in sessions %}
+        <tr>
+            <td>{{ session.domain }}</td>
+            <td>{{ session.issued.strftime("%Y-%m-%d %H:%M") }}</td>
+            <td>{{ "Yes" if session.signout else "No" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>You have no recent sessions.</p>
+{% endif %}
+<h2>Your grants</h2>
+{% if grants %}
+<ul>
+    {% for grant in grants %}
+    <li>{{ grant.domain }}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>You have no grants.</p>
+{% endif %}
+{% endblock %}

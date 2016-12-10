@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Permission request</h2>
+<p><strong>{{ domain }}</strong> would like to verify your identity.</p>
+<form method="POST">
+    <input type="hidden" name="csrf" value="{{ session.csrf }}" />
+    <label for="grant">Remember this choice</label>
+    <input type="checkbox" name="grant" id="grant" /><br />
+    <button type="submit" class="linkbutton">Continue</button> &middot;
+    <a href="/">Back to dashboard</a>
+</form>
+{% endblock %}

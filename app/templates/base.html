@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+    <head>
+        <title>{% block title %}auth-ng{% endblock %}</title>
+        <link rel="stylesheet" type="text/css" href="https://static.fwilson.me/app.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {% block head %}{% endblock %}
+    </head>
+    <body>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="messages">
+            <div class="container">
+                {% for message in messages %}
+                <span class="message">{{ message }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="container">
+            <div class="content">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+        {% block body %}{% endblock %}
+    </body>
+</html>
