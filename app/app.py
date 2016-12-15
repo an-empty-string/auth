@@ -77,7 +77,7 @@ def remove_grant():
 
     return redirect(url_for("index"))
 
-@app.route("/request/<req>", methods=["GET", "POST"])
+@app.route("/request/<req>/", methods=["GET", "POST"])
 @utils.require_csrf
 @utils.require_login
 def handle_request(req):
@@ -108,11 +108,18 @@ def handle_request(req):
     if add_grant:
         models.ServiceGrant.create(username=session["user"], domain=domain)
 
+    existing = models.Session.select() \
+                     .where(models.Session.username == session["user"],
+                            models.Session.domain == domain,
+                            models.Session.signout == False)
+    for sess in existing:
+        utils.invalidate_session(sess)
+
     meta = dict(groups=session["groups"], uid=session["userid"], display=session["display"])
     sess = models.Session.create(username=session["user"], domain=domain, meta_json=json.dumps(meta))
     return redirect(callback + ("&" if "?" in callback else "?") + "token=" + sess.token)
 
-@app.route("/session/<token>")
+@app.route("/session/<token>/")
 def token_info(token):
     try:
         session = models.Session.get(token=token)

@@ -49,7 +49,7 @@ def netloc(url):
     return urllib.parse.urlparse(url).netloc
 
 def invalidate_session(session):
-    req = requests,get("http//{}/_/idplogout/".format(session.domain), dict(token=session.token))
+    req = requests.get("http://{}/_/idplogout/".format(session.domain), dict(token=session.token))
     if req.status_code == 200:
         session.signin = True
         session.signout = True
