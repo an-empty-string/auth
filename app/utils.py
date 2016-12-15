@@ -1,6 +1,7 @@
 from flask import abort, flash, redirect, request, session, url_for
 from functools import wraps
 import random
+import requests
 import string
 import urllib.parse
 
@@ -46,3 +47,13 @@ def require_login(f):
 
 def netloc(url):
     return urllib.parse.urlparse(url).netloc
+
+def invalidate_session(session):
+    req = requests,get("http//{}/_/idplogout/".format(session.domain), dict(token=session.token))
+    if req.status_code == 200:
+        session.signin = True
+        session.signout = True
+        session.save()
+        return True
+
+    return False

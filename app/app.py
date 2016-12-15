@@ -63,6 +63,20 @@ def logout():
     flash("Logged out.")
     return redirect(url_for("login"))
 
+@app.route("/grant/remove/", methods=["POST"])
+@utils.require_csrf
+@utils.require_login
+def remove_grant():
+    domain = request.form.get("domain")
+    try:
+        grant = models.ServiceGrant.get(domain=domain, username=session["user"])
+        grant.delete_instance()
+        flash("Grant deleted. You'll now need to authorize your next login to {}.".format(domain))
+    except models.ServiceGrant.DoesNotExist:
+        flash("You don't have a grant for the requested service,")
+
+    return redirect(url_for("index"))
+
 @app.route("/request/<req>", methods=["GET", "POST"])
 @utils.require_csrf
 @utils.require_login
