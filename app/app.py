@@ -63,6 +63,27 @@ def logout():
     flash("Logged out.")
     return redirect(url_for("login"))
 
+@app.route("/logout/full/", methods=["POST"])
+@utils.require_csrf
+@utils.require_login
+def signout_all_sessions():
+    sessions = models.Session.select() \
+                             .where(models.Session.username == session["user"],
+                                    models.Session.signout == True)
+
+    for sess in sessions:
+        utils.invalidate_session(sess)
+
+    models.Session.update(signin=True) \
+                  .where(models.Session.username == session["user"],
+                         models.Session.signin == False) \
+                  .execute()
+
+    session.pop("username")
+
+    flash("Globally logged out.")
+    return redirect(url_for("index"))
+
 @app.route("/grant/remove/", methods=["POST"])
 @utils.require_csrf
 @utils.require_login
