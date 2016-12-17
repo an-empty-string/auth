@@ -10,6 +10,11 @@ class BaseModel(Model):
     class Meta:
         database = database
 
+class LocalSession(BaseModel):
+    token = CharField(32, default=utils.random_string)
+    username = CharField(64)
+    valid = BooleanField(default=True)
+
 class Session(BaseModel):
     username = CharField(64)
     domain = CharField(64)
@@ -24,5 +29,6 @@ class ServiceGrant(BaseModel):
     username = CharField(64)
     domain = CharField(64)
 
+LocalSession.create_table(True)
 Session.create_table(True)
 ServiceGrant.create_table(True)

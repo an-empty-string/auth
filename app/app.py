@@ -18,6 +18,12 @@ def do_check():
         if session["timestamp"] + timedelta(days=1) < datetime.now():
             session.clear()
 
+    if "token" in session:
+        sess = models.LocalSession.get(token=session["token"])
+        if not sess.valid:
+            session.clear()
+            flash("You have been logged out.")
+
     utils.set_csrf()
 
 @app.route("/")
@@ -49,6 +55,9 @@ def login():
         session["userid"] = info.userid
         session["groups"] = info.groups
         session["timestamp"] = datetime.now()
+        sess = models.LocalSession.create(username=session["user"])
+        session["token"] = sess.token
+
         flash("You are now logged in as {}.".format(info.displayname))
         return utils.redirect_to_next()
 
@@ -57,9 +66,7 @@ def login():
 
 @app.route("/logout/")
 def logout():
-    if "user" in session:
-        session.pop("username")
-
+    session.clear()
     flash("Logged out.")
     return redirect(url_for("login"))
 
@@ -69,17 +76,20 @@ def logout():
 def signout_all_sessions():
     sessions = models.Session.select() \
                              .where(models.Session.username == session["user"],
-                                    models.Session.signout == True)
+                                    models.Session.signout == False)
 
     for sess in sessions:
         utils.invalidate_session(sess)
 
     models.Session.update(signin=True) \
-                  .where(models.Session.username == session["user"],
-                         models.Session.signin == False) \
+                  .where(models.Session.username == session["user"]) \
                   .execute()
 
-    session.pop("username")
+    models.LocalSession.update(valid=False) \
+                      .where(models.LocalSession.username == session["user"]) \
+                      .execute()
+
+    session.clear()
 
     flash("Globally logged out.")
     return redirect(url_for("index"))

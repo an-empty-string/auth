@@ -1,7 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Dashboard</h1>
-<p>You are currently logged in as {{ session.display }} ({{ session.user }}).</p>
+You are currently logged in as {{ session.display }} ({{ session.user }}).
+You can <a href="{{ url_for("logout") }}">logout</a> or
+<form action="{{ url_for("signout_all_sessions") }}" method="POST" class="inline">
+    <input type="hidden" name="csrf" value="{{ session.csrf }}" />
+    <button class="linkbutton" type="submit">logout globally.</button>
+</form>
+
 <h2>Your current sessions</h2>
 {% if sessions %}
 <table>
@@ -9,7 +15,7 @@
         <tr>
             <th>Domain</th>
             <th>Issued</th>
-            <th>Signed out</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -17,13 +23,13 @@
         <tr>
             <td>{{ session.domain }}</td>
             <td>{{ session.issued.strftime("%Y-%m-%d %H:%M") }}</td>
-            <td>{{ "Yes" if session.signout else "No" }}</td>
+            <td>(none available)</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 {% else %}
-<p>You have no recent sessions.</p>
+<p>You have no current sessions.</p>
 {% endif %}
 <h2>Your grants</h2>
 {% if grants %}
