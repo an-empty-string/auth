@@ -24,9 +24,9 @@ def do_check():
 @utils.require_login
 def index():
     sessions = models.Session.select() \
-                             .where(models.Session.username == session["user"]) \
-                             .order_by(models.Session.issued.desc()) \
-                             .limit(20)
+                             .where(models.Session.username == session["user"],
+                                    models.Session.signout == False) \
+                             .order_by(models.Session.issued.desc())
 
     grants = models.ServiceGrant.select() \
                                 .where(models.ServiceGrant.username == session["user"])
