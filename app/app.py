@@ -63,7 +63,7 @@ def login():
         return utils.redirect_to_next()
 
     flash("Authentication failed.")
-    return render_template("login.html")
+    return render_template("login.html", _next=request.args.get("_next", "/"))
 
 @app.route("/login/xdomain/", methods=["GET", "POST"])
 @utils.require_csrf
