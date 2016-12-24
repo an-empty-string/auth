@@ -148,7 +148,7 @@ def handle_request(req):
 
     meta = dict(groups=session["groups"], uid=session["userid"], display=session["display"])
     sess = models.Session.create(username=session["user"], domain=domain, meta_json=json.dumps(meta))
-    return redirect(callback + ("&" if "?" in callback else "?") + "token=" + sess.token)
+    return redirect(callback + ("&" if "?" in callback else "?") + "token={}&by={}".format(sess.token, utils.netloc(request.url)))
 
 @app.route("/session/<token>/")
 def token_info(token):
