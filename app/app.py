@@ -76,6 +76,10 @@ def login_xdomain():
         flash("You must specify a domain to authenticate against.")
         return render_template("xdomain.html")
 
+    if domain == utils.netloc(request.url):
+        flash("You cannot create a circular cross-domain authentication path.")
+        return render_template("xdomain.html")
+
     auth = authlib.SSOAuthenticator("https://{}".format(domain))
     return redirect(auth.request_url(url_for("verify_xdomain", _next=request.args.get("_next", "/"), _external=True)))
 
@@ -161,6 +165,10 @@ def handle_request(req):
         req = json.loads(base64.urlsafe_b64decode(req).decode())
         callback = req["callback"]
         domain = utils.netloc(callback)
+        if "@{}".format(domain) in session["user"]:
+            flash("You cannot create a circular cross-domain authentication path.")
+            return redirect("/")
+
     except:
         abort(400)
 
