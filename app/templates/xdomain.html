@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Cross-domain login</h2>
+<form method="POST">
+    <input type="hidden" name="csrf" value="{{ session.csrf }}" />
+    <div class="field">
+        <label for="domain">Authenticate against</label>
+        <input type="text" name="domain" id="domain" autofocus />
+    </div>
+    <button type="submit">Login</button>
+</form>
+{% endblock %}

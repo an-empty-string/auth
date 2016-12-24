@@ -1,11 +1,12 @@
 import base64
 import json
 import os
+import random
 
-from . import models, utils
+from . import models, utils, authlib
 from .methods import LdapAuthenticator
 from datetime import datetime, timedelta
-from flask import Flask, render_template, jsonify, redirect, url_for, request, session, flash
+from flask import Flask, render_template, jsonify, redirect, url_for, request, session, flash, abort
 
 app = Flask(__name__)
 app.config.update(dict(
@@ -64,11 +65,55 @@ def login():
     flash("Authentication failed.")
     return render_template("login.html")
 
+@app.route("/login/xdomain/", methods=["GET", "POST"])
+@utils.require_csrf
+def login_xdomain():
+    if request.method == "GET":
+        return render_template("xdomain.html")
+
+    domain = request.form.get("domain", "")
+    if not domain:
+        flash("You must specify a domain to authenticate against.")
+        return render_template("xdomain.html")
+
+    auth = SSOAuthenticator("https://{}".format(domain))
+    return redirect(auth.request_url(url_for("verify_xdomain", _next=request.args.get("_next", "/"), _external=True)))
+
+@app.route("/login/xdomain/verify/")
+def verify_xdomain():
+    if "token" not in request.args or "by" not in request.args:
+        abort(400)
+
+    auth = SSOAuthenticator("https://{}".format(request.args.get("by")))
+    token = auth.token(request.args.get("token"), request.url)
+    if not token:
+        abort(400)
+
+    xdomainize = lambda k: "{}@{}".format(k, request.args.get("by"))
+    session["user"] = xdomainize(token["user"]["name"])
+    session["display"] = token["user"]["display"]
+    session["userid"] = random.randint(10**8, 10**9)
+    session["groups"] = list(map(xdomainize, token["user"]["groups"]))
+    sess = models.LocalSession.create(username=session["user"])
+    session["token"] = sess.token
+    return utils.redirect_to_next()
+
 @app.route("/logout/")
 def logout():
     session.clear()
     flash("Logged out.")
     return redirect(url_for("login"))
+
+@app.route("/_/idplogout/")
+def idplogout():
+    n = models.LocalSession.update(valid=False) \
+                           .where(models.LocalSession.token == request.args.get("token", "")) \
+                           .execute()
+
+    if not n:
+       abort(404)
+
+    return jsonify(ok=True)
 
 @app.route("/logout/full/", methods=["POST"])
 @utils.require_csrf
