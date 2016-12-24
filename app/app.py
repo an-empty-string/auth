@@ -44,7 +44,7 @@ def index():
 @utils.require_csrf
 def login():
     if request.method == "GET":
-        return render_template("login.html")
+        return render_template("login.html", _next=request.args.get("_next", "/"))
 
     authenticator = LdapAuthenticator(os.getenv("LDAP_SERVER"), os.getenv("LDAP_DN"), os.getenv("LDAP_PASSWORD"))
     username, password = request.form.get("username", ""), request.form.get("password", "")
@@ -76,7 +76,7 @@ def login_xdomain():
         flash("You must specify a domain to authenticate against.")
         return render_template("xdomain.html")
 
-    auth = SSOAuthenticator("https://{}".format(domain))
+    auth = authlib.SSOAuthenticator("https://{}".format(domain))
     return redirect(auth.request_url(url_for("verify_xdomain", _next=request.args.get("_next", "/"), _external=True)))
 
 @app.route("/login/xdomain/verify/")
@@ -84,7 +84,7 @@ def verify_xdomain():
     if "token" not in request.args or "by" not in request.args:
         abort(400)
 
-    auth = SSOAuthenticator("https://{}".format(request.args.get("by")))
+    auth = authlib.SSOAuthenticator("https://{}".format(request.args.get("by")))
     token = auth.token(request.args.get("token"), request.url)
     if not token:
         abort(400)
