@@ -50,14 +50,11 @@ def netloc(url):
 
 def invalidate_session(session):
     try:
-        req = requests.get("http://{}/_/idplogout/".format(session.domain), dict(token=session.token))
+        req = requests.get("http://{}/_/idplogout/".format(session.domain), dict(token=session.token), timeout=2)
     except:
-        return False
+        pass
 
-    if req.status_code == 200:
-        session.signin = True
-        session.signout = True
-        session.save()
-        return True
-
-    return False
+    session.signin = True
+    session.signout = True
+    session.save()
+    return True
