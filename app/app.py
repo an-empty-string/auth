@@ -66,15 +66,16 @@ def login():
     return render_template("login.html", _next=request.args.get("_next", "/"))
 
 @app.route("/login/xdomain/", methods=["GET", "POST"])
+@app.route("/login/xdomain/<domain>/")
 @utils.require_csrf
-def login_xdomain():
-    if request.method == "GET":
-        return render_template("xdomain.html")
+def login_xdomain(domain=None):
+    if request.method == "POST":
+        domain = request.form.get("domain", "")
 
-    domain = request.form.get("domain", "")
-    if not domain:
-        flash("You must specify a domain to authenticate against.")
-        return render_template("xdomain.html")
+    if request.method == "GET":
+        if not domain:
+            flash("You must specify a domain to authenticate against.")
+            return render_template("xdomain.html")
 
     if domain == utils.netloc(request.url):
         flash("You cannot create a circular cross-domain authentication path.")
