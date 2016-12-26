@@ -9,9 +9,9 @@
     <body>
         <div class="topnav">
             <div class="container">
-                <div><span>auth-ng</span></div>
+                <div><span>auth</span></div>
                 <div>
-                    {% if session.username %}<a href="{{ url_for("logout") }}">Logout</a>
+                    {% if session.user %}<a href="{{ url_for("logout") }}">Logout</a>
                     {% else %}<a href="{{ url_for("login") }}">Login</a>
                     {% endif %}
                 </div>
