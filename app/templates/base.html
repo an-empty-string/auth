@@ -7,6 +7,16 @@
         {% block head %}{% endblock %}
     </head>
     <body>
+        <div class="topnav">
+            <div class="container">
+                <div><span>auth-ng</span></div>
+                <div>
+                    {% if session.username %}<a href="{{ url_for("skel.logout") }}">Logout</a>
+                    {% else %}<a href="{{ url_for("skel.login") }}">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         <div class="messages">
