@@ -43,6 +43,10 @@ def index():
 @app.route("/login/", methods=["GET", "POST"])
 @utils.require_csrf
 def login():
+    if "user" in session:
+        flash("You are already logged in.")
+        return redirect(url_for("index"))
+
     if request.method == "GET":
         return render_template("login.html", _next=request.args.get("_next", "/"))
 
@@ -69,6 +73,10 @@ def login():
 @app.route("/login/xdomain/<domain>/")
 @utils.require_csrf
 def login_xdomain(domain=None):
+    if "user" in session:
+        flash("You are already logged in.")
+        return redirect(url_for("index"))
+
     if request.method == "POST":
         domain = request.form.get("domain", "")
 
