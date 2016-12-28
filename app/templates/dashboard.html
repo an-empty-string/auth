@@ -35,13 +35,12 @@ You can <a href="{{ url_for("logout") }}">logout</a> or
 {% if grants %}
 <ul>
     {% for grant in grants %}
-    <li>{{ grant.domain }} (
-        <form class="inline" method="POST" action="{{ url_for("remove_grant") }}">
+    <li>{{ grant.domain }} (<form class="inline" method="POST" action="{{ url_for("remove_grant") }}">
             <input type="hidden" name="csrf" value="{{ session.csrf }}"/>
             <input type="hidden" name="domain" value="{{ grant.domain }}" />
             <button class="linkbutton" type="submit">Remove grant</button>
-        </form>
-    )</li>
+        </form>)
+    </li>
     {% endfor %}
 </ul>
 {% else %}
