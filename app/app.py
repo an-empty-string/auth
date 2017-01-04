@@ -73,10 +73,6 @@ def login():
 @app.route("/login/xdomain/<domain>/")
 @utils.require_csrf
 def login_xdomain(domain=None):
-    if domain is not None and (domain.lower() not in os.getenv("CROSSDOMAIN", "").lower().split(",")):
-        flash("That is not an allowed domain.")
-        return redirect(url_for("index"))
-
     if "user" in session:
         flash("You are already logged in.")
         return redirect(url_for("index"))
@@ -92,6 +88,10 @@ def login_xdomain(domain=None):
     if domain == utils.netloc(request.url):
         flash("You cannot create a circular cross-domain authentication path.")
         return render_template("xdomain.html")
+
+    if domain is not None and (domain.lower() not in os.getenv("CROSSDOMAIN", "").lower().split(",")):
+        flash("That is not an allowed domain.")
+        return redirect(url_for("index"))
 
     auth = authlib.SSOAuthenticator("https://{}".format(domain))
     return redirect(auth.request_url(url_for("verify_xdomain", _next=request.args.get("_next", "/"), _external=True)))
