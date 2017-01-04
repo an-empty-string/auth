@@ -73,7 +73,7 @@ def login():
 @app.route("/login/xdomain/<domain>/")
 @utils.require_csrf
 def login_xdomain(domain=None):
-    if domain.lower() not in os.getenv("CROSSDOMAIN", "").lower().split(","):
+    if domain is not None and (domain.lower() not in os.getenv("CROSSDOMAIN", "").lower().split(",")):
         flash("That is not an allowed domain.")
         return redirect(url_for("index"))
 
