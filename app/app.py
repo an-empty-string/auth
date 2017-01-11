@@ -116,7 +116,7 @@ def verify_xdomain():
     return utils.redirect_to_next()
 
 @app.route("/login/kerberos/")
-def kerberos_login():
+def login_kerberos():
     if os.getenv("KERBEROS", "") == "":
         flash("Kerberos login is not enabled")
         return redirect(url_for("login"))
