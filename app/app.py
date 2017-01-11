@@ -121,6 +121,7 @@ def kerberos_login():
         flash("Kerberos login is not enabled")
         return redirect(url_for("login"))
 
+    authenticator = LdapAuthenticator(os.getenv("LDAP_SERVER"), os.getenv("LDAP_DN"), os.getenv("LDAP_PASSWORD"))
     info = authenticator.authenticate(request.headers.get("REMOTE_USER"), False)
     session["user"] = info.username
     session["display"] = info.displayname
