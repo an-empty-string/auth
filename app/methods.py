@@ -50,7 +50,7 @@ class LdapAuthenticator(Authenticator):
         user = conn.entries[0]
         self.logger.info("Found user {}".format(user.entry_dn))
 
-        if not conn.rebind(user.entry_dn, password):
+        if password is not False and not conn.rebind(user.entry_dn, password):
             self.logger.info("Failed to authenticate {}".format(username))
             return False
 

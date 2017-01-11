@@ -115,6 +115,22 @@ def verify_xdomain():
     session["token"] = sess.token
     return utils.redirect_to_next()
 
+@app.route("/login/kerberos/")
+def kerberos_login():
+    if os.getenv("KERBEROS", "") == "":
+        flash("Kerberos login is not enabled " + os.getenv("REMOTE_USER", ""))
+        return redirect(url_for("login"))
+
+    info = authenticator.authenticate(username, False)
+    session["user"] = info.username
+    session["display"] = info.displayname
+    session["userid"] = info.userid
+    session["groups"] = info.groups
+    session["timestamp"] = datetime.now()
+    sess = models.LocalSession.create(username=session["user"])
+    session["token"] = sess.token
+    return utils.redirect_to_next()
+
 @app.route("/logout/")
 def logout():
     session.clear()
