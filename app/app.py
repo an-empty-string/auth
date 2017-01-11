@@ -118,10 +118,10 @@ def verify_xdomain():
 @app.route("/login/kerberos/")
 def kerberos_login():
     if os.getenv("KERBEROS", "") == "":
-        flash("Kerberos login is not enabled " + request.headers.get("Authorization", ""))
+        flash("Kerberos login is not enabled")
         return redirect(url_for("login"))
 
-    info = authenticator.authenticate(username, False)
+    info = authenticator.authenticate(request.headers.get("REMOTE_USER"), False)
     session["user"] = info.username
     session["display"] = info.displayname
     session["userid"] = info.userid
