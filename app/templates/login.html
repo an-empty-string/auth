@@ -13,6 +13,6 @@
     </div>
     <button type="submit">Login</button>
 </form>
-<p><a href="{{ url_for("login_kerberos") }}">Use Kerberos tickets</a> &middot; <a href="{{ url_for("login_xdomain", _next=_next) }}">Cross-domain login</a></p>
+<p><a href="{{ url_for("login_kerberos", _next=_next) }}">Use Kerberos tickets</a> &middot; <a href="{{ url_for("login_xdomain", _next=_next) }}">Cross-domain login</a></p>
 
 {% endblock %}
